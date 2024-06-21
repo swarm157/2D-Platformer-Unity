@@ -39,4 +39,9 @@ public class pickup : MonoBehaviour
 
         }
     }
+    public void Update()
+    {
+        transform.Rotate(0, 100 * Time.deltaTime, 0);
+        Debug.Log(transform.rotation);
+    }
 }

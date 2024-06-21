@@ -11,13 +11,13 @@ public class PlayerController : MonoBehaviour
 
 
     public float moveSpeed = 5f;
-    public float jumpForce = 10f;
+    public float jumpForce = 200f;
     public float doubleJumpForce = 8f;
     public LayerMask groundLayer;
     public Transform groundCheck;
 
     private Rigidbody2D rb;
-    private bool isGroundedBool = false;
+    private bool isGrounded = false;
     private bool canDoubleJump = false;
 
     public Animator playeranim;
@@ -62,9 +62,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        isGroundedBool = IsGrounded();
+        isGrounded = IsGrounded();
 
-        if (isGroundedBool)
+        if (isGrounded)
         {
             canDoubleJump = true; // Reset double jump when grounded
 
@@ -93,6 +93,7 @@ public class PlayerController : MonoBehaviour
             // Calculate rotation angle based on mouse position
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 lookDirection = mousePosition - transform.position;
+            Debug.Log(lookDirection);
             float angle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
 
             // ... (your existing code for rotation)
@@ -113,21 +114,21 @@ public class PlayerController : MonoBehaviour
 
         //impactEffect
 
-        if(!wasonGround && isGroundedBool)
+        if(!wasonGround && isGrounded)
         {
             ImpactEffect.gameObject.SetActive(true);
             ImpactEffect.Stop();
             ImpactEffect.transform.position = new Vector2(footsteps.transform.position.x,footsteps.transform.position.y-0.2f);
             ImpactEffect.Play();
         }
-
-        wasonGround = isGroundedBool;
+        Debug.Log(isGrounded);
+        wasonGround = isGrounded;
 
         
     }
     public void SetAnimations()
     {
-        if (moveX != 0 && isGroundedBool)
+        if (moveX != 0 && isGrounded)
         {
             playeranim.SetBool("run", true);
             footEmissions.rateOverTime= 35f;
@@ -138,7 +139,7 @@ public class PlayerController : MonoBehaviour
             footEmissions.rateOverTime = 0f;
         }
 
-        playeranim.SetBool("isGrounded", isGroundedBool);
+        playeranim.SetBool("isGrounded", isGrounded);
        
     }
 
@@ -178,8 +179,11 @@ public class PlayerController : MonoBehaviour
     private bool IsGrounded()
     {
         float rayLength = 0.25f;
+        
         Vector2 rayOrigin = new Vector2(groundCheck.transform.position.x, groundCheck.transform.position.y - 0.1f);
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayLength, groundLayer);
+        Debug.Log(rayOrigin.ToString());
+        Debug.Log(hit.ToString());
         return hit.collider != null;
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -220,7 +224,7 @@ public class PlayerController : MonoBehaviour
     }
     public void MobileJump()
     {
-        if (isGroundedBool)
+        if (isGrounded)
         {
             // Perform initial jump
             Jump(jumpForce);
